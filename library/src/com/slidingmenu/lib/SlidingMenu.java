@@ -233,14 +233,20 @@ public class SlidingMenu extends RelativeLayout {
 			public static final int POSITION_OPEN = 0;
 			public static final int POSITION_CLOSE = 1;
 
-			private Boolean mLastMenuShowing = null;
+			private CustomViewAbove.State mLastState = CustomViewAbove.State.UNDEFINED;
 
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 				// nothing
 			}
 
 			public void onPageMoved(CustomViewAbove.State state) {
-				Log.d(">>>>", "state: " + state);
+				if (mClosingListener != null && mLastState == CustomViewAbove.State.OPENED && state == CustomViewAbove.State.SCROLLING) {
+					mClosingListener.onClosing();
+				} else if (mOpeningListener != null && mLastState == CustomViewAbove.State.CLOSED && state == CustomViewAbove.State.SCROLLING) {
+					mOpeningListener.onOpening();
+				}
+
+				mLastState = state;
 			}
 
 			public void onPageSelected(int position) {
