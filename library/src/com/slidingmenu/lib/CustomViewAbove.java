@@ -41,6 +41,13 @@ public class CustomViewAbove extends ViewGroup {
 	private static final int MAX_SETTLE_DURATION = 600; // ms
 	private static final int MIN_DISTANCE_FOR_FLING = 25; // dips
 
+	public static enum State {
+		UNDEFINED,
+		OPENED,
+		CLOSED,
+		SCROLLING,
+	};
+
 	private static final Interpolator sInterpolator = new Interpolator() {
 		public float getInterpolation(float t) {
 			t -= 1.0f;
@@ -56,6 +63,7 @@ public class CustomViewAbove extends ViewGroup {
 	private boolean mScrollingCacheEnabled;
 
 	private boolean mScrolling;
+	private State mState = State.UNDEFINED; // unknown state
 
 	private boolean mIsBeingDragged;
 	private boolean mIsUnableToDrag;
@@ -118,6 +126,13 @@ public class CustomViewAbove extends ViewGroup {
 		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels);
 
 		/**
+		 * This method will be invoked during any event on CustomViewAbove.
+		 *
+		 * @param state Status of page
+		 */
+		public void onPageMoved(State state);
+
+		/**
 		 * This method will be invoked when a new page becomes selected. Animation is not
 		 * necessarily complete.
 		 *
@@ -138,14 +153,13 @@ public class CustomViewAbove extends ViewGroup {
 			// This space for rent
 		}
 
+		public void onPageMoved(State state) {
+			// This space for rent
+		}
+
 		public void onPageSelected(int position) {
 			// This space for rent
 		}
-
-		public void onPageScrollStateChanged(int state) {
-			// This space for rent
-		}
-
 	}
 
 	public CustomViewAbove(Context context) {
@@ -396,11 +410,15 @@ public class CustomViewAbove extends ViewGroup {
 		if (dx == 0 && dy == 0) {
 			completeScroll();
 			if (isMenuOpen()) {
-				if (mOpenedListener != null)
+				setState(State.OPENED);
+				if (mOpenedListener != null) {
 					mOpenedListener.onOpened();
+				}
 			} else {
-				if (mClosedListener != null)
+				setState(State.CLOSED);
+				if (mClosedListener != null) {
 					mClosedListener.onClosed();
+				}
 			}
 			return;
 		}
@@ -509,6 +527,8 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	private void pageScrolled(int xpos) {
+		setState(State.SCROLLING);
+
 		final int widthWithMargin = getWidth();
 		final int position = xpos / widthWithMargin;
 		final int offsetPixels = xpos % widthWithMargin;
@@ -551,12 +571,17 @@ public class CustomViewAbove extends ViewGroup {
 			if (oldX != x || oldY != y) {
 				scrollTo(x, y);
 			}
+
 			if (isMenuOpen()) {
-				if (mOpenedListener != null)
+				setState(State.OPENED);
+				if (mOpenedListener != null) {
 					mOpenedListener.onOpened();
+				}
 			} else {
-				if (mClosedListener != null)
+				setState(State.CLOSED);
+				if (mClosedListener != null) {
 					mClosedListener.onClosed();
+				}
 			}
 		}
 		mScrolling = false;
@@ -606,6 +631,13 @@ public class CustomViewAbove extends ViewGroup {
 		if (activePointerIndex == -1)
 			mActivePointerId = INVALID_POINTER;
 		return activePointerIndex;
+	}
+
+	private void setState(State state) {
+		mState = state;
+		if (mOnPageChangeListener != null) {
+			mOnPageChangeListener.onPageMoved(state);
+		}
 	}
 
 	private boolean mQuickReturn = false;

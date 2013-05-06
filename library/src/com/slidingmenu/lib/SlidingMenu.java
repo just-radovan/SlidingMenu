@@ -72,6 +72,18 @@ public class SlidingMenu extends RelativeLayout {
 
 	private OnCloseListener mCloseListener;
 
+	private OnOpeningListener mOpeningListener;
+
+	private OnClosingListener mClosingListener;
+
+	public interface OnOpeningListener {
+
+		/**
+		 * On opening.
+		 */
+		public void onOpening();
+	}
+
 	/**
 	 * The listener interface for receiving onOpen events.
 	 * The class that is interested in processing a onOpen
@@ -106,6 +118,14 @@ public class SlidingMenu extends RelativeLayout {
 		 * On opened.
 		 */
 		public void onOpened();
+	}
+
+	public interface OnClosingListener {
+
+		/**
+		 * On closing.
+		 */
+		public void onClosing();
 	}
 
 	/**
@@ -213,8 +233,15 @@ public class SlidingMenu extends RelativeLayout {
 			public static final int POSITION_OPEN = 0;
 			public static final int POSITION_CLOSE = 1;
 
-			public void onPageScrolled(int position, float positionOffset,
-					int positionOffsetPixels) { }
+			private Boolean mLastMenuShowing = null;
+
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+				// nothing
+			}
+
+			public void onPageMoved(CustomViewAbove.State state) {
+				Log.d(">>>>", "state: " + state);
+			}
 
 			public void onPageSelected(int position) {
 				if (position == POSITION_OPEN && mOpenListener != null) {
@@ -869,6 +896,15 @@ public class SlidingMenu extends RelativeLayout {
 	}
 
 	/**
+	 * Sets the OnOpeningListener. {@link OnOpeningListener#onOpening() OnOpeningListener.onOpening()} will be called when the SlidingMenu begins Opening move
+	 *
+	 * @param listener the new setOnOpeningListener
+	 */
+	public void setOnOpeningListener(OnOpeningListener listener) {
+		mOpeningListener = listener;
+	}
+
+	/**
 	 * Sets the OnOpenListener. {@link OnOpenListener#onOpen() OnOpenListener.onOpen()} will be called when the SlidingMenu is opened
 	 *
 	 * @param listener the new OnOpenListener
@@ -878,6 +914,15 @@ public class SlidingMenu extends RelativeLayout {
 		mOpenListener = listener;
 	}
 
+	/**
+	 * Sets the OnClosingListener. {@link OnClosingListener#onClosing() OnClosingListener.onClosing()} will be called when the SlidingMenu begins closing move
+	 *
+	 * @param listener the new setOnClosingListener
+	 */
+	public void setOnClosingListener(OnClosingListener listener) {
+		mClosingListener = listener;
+	}
+	
 	/**
 	 * Sets the OnCloseListener. {@link OnCloseListener#onClose() OnCloseListener.onClose()} will be called when the SlidingMenu is closed
 	 *
