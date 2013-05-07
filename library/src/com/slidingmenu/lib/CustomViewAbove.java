@@ -244,9 +244,11 @@ public class CustomViewAbove extends ViewGroup {
 		if (dispatchSelected && mOnPageChangeListener != null) {
 			mOnPageChangeListener.onPageSelected(item);
 		}
+
 		if (dispatchSelected && mInternalPageChangeListener != null) {
 			mInternalPageChangeListener.onPageSelected(item);
 		}
+
 		if (smoothScroll) {
 			smoothScrollTo(destX, 0, velocity);
 		} else {
@@ -573,17 +575,22 @@ public class CustomViewAbove extends ViewGroup {
 			}
 
 			if (isMenuOpen()) {
-				setState(State.OPENED);
 				if (mOpenedListener != null) {
 					mOpenedListener.onOpened();
 				}
 			} else {
-				setState(State.CLOSED);
 				if (mClosedListener != null) {
 					mClosedListener.onClosed();
 				}
 			}
 		}
+
+		if (isMenuOpen()) {
+			setState(State.OPENED);
+		} else {
+			setState(State.CLOSED);
+		}
+
 		mScrolling = false;
 	}
 

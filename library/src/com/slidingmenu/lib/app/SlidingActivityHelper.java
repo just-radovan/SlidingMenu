@@ -52,14 +52,12 @@ public class SlidingActivityHelper {
 	 */
 	public void onPostCreate(Bundle savedInstanceState) {
 		if (mViewBehind == null || mViewAbove == null) {
-			throw new IllegalStateException("Both setBehindContentView must be called " +
-					"in onCreate in addition to setContentView.");
+			throw new IllegalStateException("Both setBehindContentView must be called in onCreate in addition to setContentView.");
 		}
 
 		mOnPostCreateCalled = true;
 
-		mSlidingMenu.attachToActivity(mActivity, 
-				mEnableSlide ? SlidingMenu.SLIDING_WINDOW : SlidingMenu.SLIDING_CONTENT);
+		mSlidingMenu.attachToActivity(mActivity, mEnableSlide ? SlidingMenu.SLIDING_WINDOW : SlidingMenu.SLIDING_CONTENT);
 		
 		final boolean open;
 		final boolean secondary;
@@ -70,6 +68,7 @@ public class SlidingActivityHelper {
 			open = false;
 			secondary = false;
 		}
+
 		new Handler().post(new Runnable() {
 			public void run() {
 				if (open) {
